@@ -1,12 +1,12 @@
 package cvnhan.android.androidlogin;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
@@ -34,13 +34,13 @@ import com.facebook.share.widget.ShareDialog;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Set;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends Activity {
 
     private LoginButton loginButton;
     CallbackManager callbackManager;
     ShareDialog shareDialog;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,26 +64,44 @@ public class MainActivity extends FragmentActivity {
             Log.e("nosuchalgorithmex", e.toString());
         }
 
+        if(hasEmailPermission()==false){
+            LoginManager.getInstance().logInWithReadPermissions(this,Arrays.asList("email"));
+        }else{
+            loginButton = (LoginButton) findViewById(R.id.login_button);
+            loginButton.setReadPermissions(Arrays.asList("public_profile", "email"));
+            loginButton.setText("Log in with FB");
+            LoginManager.getInstance().logInWithReadPermissions(this,Arrays.asList("email"));
+            LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+                @Override
+                public void onSuccess(LoginResult loginResult) {
+                    ((TextView) findViewById(R.id.txtView)).setText(loginResult.getAccessToken().getUserId() + "-" + loginButton.getText());
 
-        loginButton = (LoginButton) findViewById(R.id.login_button);
-        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                ((TextView) findViewById(R.id.txtView)).setText(loginResult.getAccessToken().getUserId() + "-" + loginButton.getText());
-                Log.e("onSuccess", loginResult.getAccessToken().toString());
-            }
+                    Set<String> permissions=loginResult.getAccessToken().getPermissions();
+                    Set<String> deniedpermissions=loginResult.getAccessToken().getDeclinedPermissions();
+                    Set<String> grantedpermissions=loginResult.getRecentlyGrantedPermissions();
+                    for(String s:permissions){
+                        Log.e("permissions", s);
+                    }
+                    for(String s:deniedpermissions){
+                        Log.e("deniedpermissions", s);
+                    }
+                    for(String s:grantedpermissions){
+                        Log.e("grantedpermissions", s);
+                    }
+                    Log.e("onSuccess", loginResult.getAccessToken().toString());
+                }
 
-            @Override
-            public void onCancel() {
-                Log.e("onCancel", "cancel");
-            }
+                @Override
+                public void onCancel() {
+                    Log.e("onCancel", "cancel");
+                }
 
-            @Override
-            public void onError(FacebookException e) {
-                Log.e("onError", e.toString());
-            }
-        });
-        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "user_friends", "email"));
+                @Override
+                public void onError(FacebookException e) {
+                    Log.e("onError", e.toString());
+                }
+            });
+        }
 
         ((Button) findViewById(R.id.shareBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,7 +115,7 @@ public class MainActivity extends FragmentActivity {
         findViewById(R.id.getMebtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final GraphRequest graphRequest = new GraphRequest(AccessToken.getCurrentAccessToken(),"/me",null,HttpMethod.GET,new GraphRequest.Callback() {
+                final GraphRequest graphRequest = new GraphRequest(AccessToken.getCurrentAccessToken(),"/me",null, HttpMethod.GET,new GraphRequest.Callback() {
                     @Override
                     public void onCompleted(GraphResponse graphResponse) {
                         String s=graphResponse.getJSONObject().toString();
@@ -130,7 +148,10 @@ public class MainActivity extends FragmentActivity {
         });
 
     }
-
+    private boolean hasEmailPermission() {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        return accessToken != null && accessToken.getPermissions().contains("email");
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
