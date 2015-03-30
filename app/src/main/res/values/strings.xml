@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">AndroidLogin</string>
+
+    <string name="hello_world">Hello world!</string>
+    <!-- Button text -->
+    <string name="btn_logout_from_google">Logout from Google</string>
+    <string name="btn_revoke_access">Revoke Access</string>
+    <string name="facebook_app_id">887309281312741</string>
+
+</resources>
