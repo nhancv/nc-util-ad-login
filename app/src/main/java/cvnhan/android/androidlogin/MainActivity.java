@@ -274,7 +274,7 @@ public class MainActivity extends Activity implements OnClickListener,
             }
         }
         callbackManager.onActivityResult(requestCode, responseCode, intent);
-        Log.e("callbackManager", requestCode + " " + responseCode + " " + intent.toString());
+        if(intent!=null) Log.e("callbackManager", requestCode + " " + responseCode + " " + intent.toString());
 
     }
 
