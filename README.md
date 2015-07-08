@@ -121,16 +121,16 @@ MainActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         android.support.v4.app.Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
         if (fragment instanceof SignInFragment) {
-            fragment.onActivityResult(requestCode, resultCode, data);
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
+            ((SignInFragment)fragment).onActivityResult(requestCode, resultCode, data);
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 ```
 In fragment
 ```
 #!java
-public void onActivityResult(int requestCode, int responseCode,
+    @Override
+    public void onActivityResult(int requestCode, int responseCode,
                                  Intent intent) {
         if (requestCode == RC_SIGN_IN) {
             if (responseCode != getActivity().RESULT_OK) {
@@ -141,6 +141,6 @@ public void onActivityResult(int requestCode, int responseCode,
                 mGoogleApiClient.connect();
             }
         }
+        callbackManager.onActivityResult(requestCode, responseCode, intent);
     }
-
 ```
