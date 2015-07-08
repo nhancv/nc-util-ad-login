@@ -66,6 +66,11 @@ public class MainActivity extends Activity implements OnClickListener,
     private static final int PROFILE_PIC_SIZE = 400;
     CallbackManager callbackManager;
     ShareDialog shareDialog;
+
+    //ref: http://www.androidhive.info/2014/02/android-login-with-google-plus-account-1/
+    //register: https://code.google.com/apis/console/
+    //get key hash: keytool -list -v -keystore "%USERPROFILE%\.android\debug.keystore" -alias androiddebugkey -storepass android -keypass android
+    //copy SHA1 to
     // Google client to interact with Google API
     private GoogleApiClient mGoogleApiClient;
     /**
@@ -80,7 +85,10 @@ public class MainActivity extends Activity implements OnClickListener,
     private ImageView imgProfilePic;
     private TextView txtName, txtEmail;
     private LinearLayout llProfileLayout;
-    //facebook
+
+    //Facebook
+    //Register: https://developers.facebook.com/
+    //get key hash: keytool -exportcert -alias YOUR_RELEASE_KEY_ALIAS -keystore YOUR_RELEASE_KEY_PATH | openssl sha1 -binary | openssl base64
     private LoginButton loginButton;
 
     @Override
@@ -225,14 +233,18 @@ public class MainActivity extends Activity implements OnClickListener,
      * Method to resolve any signin errors
      */
     private void resolveSignInError() {
-        if (mConnectionResult.hasResolution()) {
-            try {
-                mIntentInProgress = true;
-                mConnectionResult.startResolutionForResult(this, RC_SIGN_IN);
-            } catch (SendIntentException e) {
-                mIntentInProgress = false;
-                mGoogleApiClient.connect();
+        try {
+            if (mConnectionResult.hasResolution()) {
+                try {
+                    mIntentInProgress = true;
+                    mConnectionResult.startResolutionForResult(this, RC_SIGN_IN);
+                } catch (SendIntentException e) {
+                    mIntentInProgress = false;
+                    mGoogleApiClient.connect();
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -431,7 +443,7 @@ public class MainActivity extends Activity implements OnClickListener,
         if (mGoogleApiClient.isConnected()) {
             Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
             mGoogleApiClient.disconnect();
-            mGoogleApiClient.connect();
+//            mGoogleApiClient.connect();
             updateUI(false);
         }
     }
