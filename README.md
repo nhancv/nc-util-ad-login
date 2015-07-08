@@ -141,6 +141,7 @@ In fragment
                 mGoogleApiClient.connect();
             }
         }
+//use for fb login
         callbackManager.onActivityResult(requestCode, responseCode, intent);
     }
 ```
