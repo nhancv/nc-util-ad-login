@@ -127,6 +127,7 @@ public class MainActivity extends Activity implements OnClickListener,
 
 
         loginButton = (LoginButton) findViewById(R.id.login_button);
+//        loginButton.setBackgroundResource(R.drawable.facebook);
         loginButton.setReadPermissions(Arrays.asList("email"));
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
@@ -484,3 +485,53 @@ public class MainActivity extends Activity implements OnClickListener,
 
 
 }
+
+
+/*
+CUSTOM DESIGN BUTTON FB
+
+layout.xml
+
+<Button
+android:id="@+id/btn_fb_login"
+        .../>
+MainActivity.java
+@Override
+public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+
+        FacebookSdk.sdkInitialize(this.getApplicationContext());
+
+        callbackManager=CallbackManager.Factory.create();
+
+        LoginManager.getInstance().registerCallback(callbackManager,
+        new FacebookCallback<LoginResult>(){
+@Override
+public void onSuccess(LoginResult loginResult){
+        Log.d("Success","Login");
+
+        }
+
+@Override
+public void onCancel(){
+        Toast.makeText(MainActivity.this,"Login Cancel",Toast.LENGTH_LONG).show();
+        }
+
+@Override
+public void onError(FacebookException exception){
+        Toast.makeText(MainActivity.this,exception.getMessage(),Toast.LENGTH_LONG).show();
+        }
+        });
+
+        setContentView(R.layout.activity_main);
+
+        Button btn_fb_login=(Button)findViewById(R.id.btn_fb_login);
+
+        btn_fb_login.setOnClickListener(new View.OnClickListener(){
+@Override
+public void onClick(View view){
+        LoginManager.getInstance().logInWithReadPermissions(this,Arrays.asList("public_profile","user_friends"));
+        }
+        });
+
+        }*/

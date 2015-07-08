@@ -76,13 +76,18 @@
             android:layout_height="wrap_content"
             android:text="@string/hello_world" />
 
-        <com.facebook.login.widget.LoginButton
+        <com.facebook.login.widget.LoginButton xmlns:fb="http://schemas.android.com/apk/res-auto"
             android:id="@+id/login_button"
+            style="@style/FacebookLoginButton"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="30dp"
-            android:layout_marginTop="30dp" />
+            android:layout_marginTop="30dp"
+            android:contentDescription="contentDescription"
+            android:scaleType="centerInside"
+            fb:login_text="Login"
+            fb:logout_text="Logout" />
 
         <Button
             android:id="@+id/shareBtn"
