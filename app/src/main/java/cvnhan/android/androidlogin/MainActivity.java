@@ -64,31 +64,24 @@ public class MainActivity extends Activity implements OnClickListener,
 
     // Profile pic image size in pixels
     private static final int PROFILE_PIC_SIZE = 400;
-
+    CallbackManager callbackManager;
+    ShareDialog shareDialog;
     // Google client to interact with Google API
     private GoogleApiClient mGoogleApiClient;
-
     /**
      * A flag indicating that a PendingIntent is in progress and prevents us
      * from starting further intents.
      */
     private boolean mIntentInProgress;
-
     private boolean mSignInClicked;
-
     private ConnectionResult mConnectionResult;
-
     private SignInButton btnSignIn;
     private Button btnSignOut, btnRevokeAccess;
     private ImageView imgProfilePic;
     private TextView txtName, txtEmail;
     private LinearLayout llProfileLayout;
-
-
     //facebook
     private LoginButton loginButton;
-    CallbackManager callbackManager;
-    ShareDialog shareDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,7 +132,7 @@ public class MainActivity extends Activity implements OnClickListener,
             @Override
             public void onSuccess(LoginResult loginResult) {
                 ((TextView) findViewById(R.id.txtView)).setText(loginResult.getAccessToken().getUserId() + "-" + loginButton.getText());
-                Log.e("onSuccess", loginResult.getAccessToken().toString() + " "+loginResult.getAccessToken().getToken());
+                Log.e("onSuccess", loginResult.getAccessToken().toString() + " " + loginResult.getAccessToken().getToken());
             }
 
             @Override
@@ -167,7 +160,7 @@ public class MainActivity extends Activity implements OnClickListener,
         findViewById(R.id.getMebtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(hasEmailPermission()) {
+                if (hasEmailPermission()) {
                     final GraphRequest graphRequest = new GraphRequest(AccessToken.getCurrentAccessToken(), "/me", null, HttpMethod.GET, new GraphRequest.Callback() {
                         @Override
                         public void onCompleted(GraphResponse graphResponse) {
@@ -201,11 +194,13 @@ public class MainActivity extends Activity implements OnClickListener,
         });
 
     }
+
     private boolean hasEmailPermission() {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        if(accessToken==null) return false;
-        boolean check=accessToken.getPermissions().contains("email");
-        if(!check){
+        if (accessToken == null) return false;
+        Log.e(TAG, "hasEmailPermission token=" + accessToken.getToken());
+        boolean check = accessToken.getPermissions().contains("email");
+        if (!check) {
             LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
             return false;
         }
@@ -277,7 +272,8 @@ public class MainActivity extends Activity implements OnClickListener,
             }
         }
         callbackManager.onActivityResult(requestCode, responseCode, intent);
-        if(intent!=null) Log.e("callbackManager", requestCode + " " + responseCode + " " + intent.toString());
+        if (intent != null)
+            Log.e("callbackManager", requestCode + " " + responseCode + " " + intent.toString());
 
     }
 
@@ -309,7 +305,7 @@ public class MainActivity extends Activity implements OnClickListener,
     }
 
     private void getAccessToken() {
-        AsyncTask<Void, Void, String > task = new AsyncTask<Void, Void, String>() {
+        AsyncTask<Void, Void, String> task = new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
                 String token = null;
@@ -327,6 +323,7 @@ public class MainActivity extends Activity implements OnClickListener,
                 }
                 return token;
             }
+
             @Override
             protected void onPostExecute(String token) {
                 Log.e(TAG, "Access token retrieved:" + token);
