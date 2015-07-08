@@ -36,6 +36,8 @@ import com.facebook.login.widget.LoginButton;
 import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
@@ -47,6 +49,7 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -136,7 +139,7 @@ public class MainActivity extends Activity implements OnClickListener,
             @Override
             public void onSuccess(LoginResult loginResult) {
                 ((TextView) findViewById(R.id.txtView)).setText(loginResult.getAccessToken().getUserId() + "-" + loginButton.getText());
-                Log.e("onSuccess", loginResult.getAccessToken().toString());
+                Log.e("onSuccess", loginResult.getAccessToken().toString() + " "+loginResult.getAccessToken().getToken());
             }
 
             @Override
@@ -296,13 +299,40 @@ public class MainActivity extends Activity implements OnClickListener,
     public void onConnected(Bundle arg0) {
         mSignInClicked = false;
         Toast.makeText(this, "User is connected!", Toast.LENGTH_LONG).show();
-
         // Get user's information
         getProfileInformation();
-
+        //get access token
+        getAccessToken();
         // Update the UI after signin
         updateUI(true);
 
+    }
+
+    private void getAccessToken() {
+        AsyncTask<Void, Void, String > task = new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                String token = null;
+//                https://developers.google.com/+/web/api/rest/oauth
+                final String SCOPES = "https://www.googleapis.com/auth/plus.login";
+                try {
+                    token = GoogleAuthUtil.getToken(
+                            getApplicationContext(),
+                            Plus.AccountApi.getAccountName(mGoogleApiClient),
+                            "oauth2:" + SCOPES);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (GoogleAuthException e) {
+                    e.printStackTrace();
+                }
+                return token;
+            }
+            @Override
+            protected void onPostExecute(String token) {
+                Log.e(TAG, "Access token retrieved:" + token);
+            }
+        };
+        task.execute();
     }
 
     /**
@@ -334,7 +364,6 @@ public class MainActivity extends Activity implements OnClickListener,
                 String personPhotoUrl = currentPerson.getImage().getUrl();
                 String personGooglePlusProfile = currentPerson.getUrl();
                 String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
-
                 Log.e(TAG, "Name: " + personName + ", plusProfile: "
                         + personGooglePlusProfile + ", email: " + email
                         + ", Image: " + personPhotoUrl);
