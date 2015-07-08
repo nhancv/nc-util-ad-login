@@ -57,6 +57,25 @@ App Details tab:
 - Save changes
 ```
 
+In AndroidManifest.xml
+
+```
+#!xml
+<meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <provider
+            android:name="com.facebook.FacebookContentProvider"
+            android:authorities="com.facebook.app.FacebookContentProvider887309281312741"
+            android:exported="true" />
+```
+
 
 #Setup Google+ login: #
 * Ref: http://www.androidhive.info/2014/02/android-login-with-google-plus-account-1/
